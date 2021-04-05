@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'nlfwrwxt44ed-xn7&sd15un!pmf!5yjjn7#ta+!yk%lk=--jwm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -73,10 +73,15 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# 设置数据库。这里用户名和密码必需和docker-compose.yml里mysql环境变量保持一致
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'myproject',  # 数据库名
+        'USER': 'dbuser',  # 你设置的用户名 - 非root用户
+        'PASSWORD': 'password',  # # 换成你自己密码
+        'HOST': 'db',  # 注意：这里使用的是db别名，docker会自动解析成ip
+        'PORT': '3306',  # 端口
     }
 }
 
@@ -117,4 +122,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
+# 设置STATIC ROOT 和 STATIC URL
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = "/static/"
+
+# 设置MEDIA ROOT 和 MEDIA URL
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+
+# 设置redis缓存。这里密码为redis.conf里设置的密码
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",  # 这里直接使用redis别名作为host ip地址
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": "yourpassword",  # 换成你自己密码
+        },
+    }
+}
