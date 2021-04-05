@@ -30,7 +30,7 @@ services:
       - ./compose/mysql/init:/docker-entrypoint-initdb.d/ # 挂载数据初始化sql脚本
     ports:
       - "3306:3306" # 与配置文件保持一致
-      restart: always
+    restart: always
 
   web:
     build: ./myproject # 使用myproject目录下的Dockerfile
